@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+const storeRouter = require("./routes/store");
+const ordersRouter = require("./routes/orders");
 const authRouter = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
 const customersRouter = require("./routes/customers");
@@ -21,6 +23,10 @@ app.use(express.json());
 
 // --------------- Public routes (no auth) ---------------
 app.use("/api/auth", authRouter);
+app.use("/api/store", storeRouter);
+app.use("/api/store", ordersRouter);    // POST orders, GET order/:id, POST bookings
+// --------------- Admin routes (auth required) ---------------
+app.use("/api/admin", ordersRouter);    // GET/PUT orders, GET/PUT bookings
 
 // --------------- Protected routes (auth required) ---------------
 app.use("/api/dashboard", authMiddleware, dashboardRouter);

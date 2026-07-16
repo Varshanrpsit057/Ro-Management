@@ -1,8 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicLayout from "./components/PublicLayout";
 import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Landing from "./pages/Landing";
+import ROProducts from "./pages/ROProducts";
+import UPSProducts from "./pages/UPSProducts";
+import CartPage from "./pages/CartPage";
+import { AboutPage, ContactPage, BookServicePage } from "./pages/StaticPages";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import CustomerForm from "./pages/CustomerForm";
@@ -15,13 +21,22 @@ import ServiceHistory from "./pages/ServiceHistory";
 export default function App() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public store routes */}
+      <Route path="/" element={<PublicLayout><Landing /></PublicLayout>} />
+      <Route path="/ro-products" element={<PublicLayout><ROProducts /></PublicLayout>} />
+      <Route path="/ups-products" element={<PublicLayout><UPSProducts /></PublicLayout>} />
+      <Route path="/cart" element={<PublicLayout><CartPage /></PublicLayout>} />
+      <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
+      <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
+      <Route path="/book-service" element={<PublicLayout><BookServicePage /></PublicLayout>} />
+
+      {/* Auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected routes */}
+      {/* Protected admin routes */}
       <Route
-        path="/*"
+        path="/admin/*"
         element={
           <ProtectedRoute>
             <Layout>

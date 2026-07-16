@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0c4a6e"/><stop offset="100%" style="stop-color:#0284c7"/></linearGradient></defs>
+  <rect width="1200" height="600" fill="url(#g)"/>
+  <text x="600" y="200" text-anchor="middle" fill="#fff" font-size="48" font-weight="800" font-family="Arial,sans-serif">ACS RO Water System</text>
+  <text x="600" y="260" text-anchor="middle" fill="rgba(255,255,255,.85)" font-size="22" font-family="Arial,sans-serif">Pure Water for Every Home — Since 2008</text>
+  <text x="600" y="330" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="16" font-family="Arial,sans-serif">📍 Kambainallur Main Road, Morappur, Dharmapuri - 635305</text>
+</svg>
