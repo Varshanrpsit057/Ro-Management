@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 
-const API = axios.create({ baseURL: "http://localhost:5000/api/store" });
+const API = axios.create({ baseURL: "/api/store" });
 
 export default function ROProducts() {
   const [products, setProducts] = useState([]);

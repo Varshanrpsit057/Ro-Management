@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { fetchDashboard, fetchNotifications } from "../api";
 import axios from "axios";
 
-const API = axios.create({ baseURL: "http://localhost:5000/api" });
+const API = axios.create({ baseURL: "/api" });
 API.interceptors.request.use((c) => { c.headers.Authorization = localStorage.getItem("ro_token") || ""; return c; });
 
 export default function Dashboard() {
