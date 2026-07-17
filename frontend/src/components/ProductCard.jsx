@@ -1,4 +1,6 @@
 import { useState } from "react";
+import LazyImage from "./LazyImage";
+import { motion } from "framer-motion";
 
 function getImagePath(product) {
   const cat = product.category || "";
@@ -22,45 +24,78 @@ function getImagePath(product) {
 }
 
 export default function ProductCard({ product, onAddToCart }) {
-  const [imgError, setImgError] = useState(false);
+  const [added, setAdded] = useState(false);
   const isROSystem = (product.category === "Complete RO Systems" || (product.name || "").toLowerCase().includes("purifier"));
   const imgSrc = getImagePath(product);
 
+  const handleAddToCart = () => {
+    if (!onAddToCart || product.stock_qty <= 0) return;
+    setAdded(true);
+    onAddToCart(product);
+    setTimeout(() => setAdded(false), 1500);
+  };
+
   return (
-    <div className="store-product-card slide-up">
+    <motion.div
+      className="store-product-card"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -6 }}
+    >
       <div className="product-image-wrap">
-        {imgError ? (
-          <div className="img-placeholder" style={{ background: "#f1f5f9" }}>
-            <span className="img-placeholder-icon">📦</span>
-            <span className="img-placeholder-label">Image Coming Soon</span>
-          </div>
-        ) : (
-          <>
-            <div className="img-skeleton" />
-            <img
-              src={imgSrc}
-              alt={product.name}
-              className="store-product-img"
-              style={{ objectFit: isROSystem ? "cover" : "contain" }}
-              loading="lazy"
-              onLoad={(e) => { e.target.classList.add("loaded"); if (e.target.previousElementSibling) e.target.previousElementSibling.style.display = "none"; }}
-              onError={() => setImgError(true)}
-            />
-          </>
-        )}
+        <LazyImage
+          src={imgSrc}
+          alt={product.name}
+          containerClassName="product-lazy-wrap"
+          className="store-product-lazy-img"
+          objectFit={isROSystem ? "cover" : "contain"}
+          fallbackSrc="/images/ro-system.svg"
+        />
         {product.is_featured && <span className="featured-badge">Featured</span>}
       </div>
       <div className="store-product-body">
-        <span className={`product-category-tag ${product.store_type === "ups" ? "ups-tag" : ""}`}>{product.category}</span>
+        <span className={`product-category-tag ${product.store_type === "ups" ? "ups-tag" : ""}`}>
+          {product.category}
+        </span>
         <h3>{product.name}</h3>
         <p className="product-brand">{product.brand} {product.model && `• ${product.model}`}</p>
         <p className="product-desc-short">{product.description?.substring(0, 100)}{product.description?.length > 100 ? "..." : ""}</p>
-        {product.features && (<ul className="feature-list">{product.features.split(",").slice(0, 3).map((f, i) => (<li key={i}>{f.trim()}</li>))}</ul>)}
-        {product.specs && (<div className="specs-pills">{product.specs.capacity && <span className="spec-pill">⚡ {product.specs.capacity}</span>}{product.specs.wattage && <span className="spec-pill">🔌 {product.specs.wattage}</span>}{product.specs.voltage && <span className="spec-pill">🔋 {product.specs.voltage}</span>}{product.specs.backup && <span className="spec-pill">⏱️ {product.specs.backup}</span>}</div>)}
-        <div className="product-price-row"><span className="store-price">₹{parseFloat(product.price).toLocaleString("en-IN")}</span><span className={`stock-tag ${product.stock_qty > 5 ? "in-stock" : product.stock_qty > 0 ? "low-stock" : "out-of-stock"}`}>{product.stock_qty > 5 ? "In Stock" : product.stock_qty > 0 ? `Only ${product.stock_qty} left` : "Out of Stock"}</span></div>
+        {product.features && (
+          <ul className="feature-list">
+            {product.features.split(",").slice(0, 3).map((f, i) => (<li key={i}>{f.trim()}</li>))}
+          </ul>
+        )}
+        {product.specs && (
+          <div className="specs-pills">
+            {product.specs.capacity && <span className="spec-pill">⚡ {product.specs.capacity}</span>}
+            {product.specs.wattage && <span className="spec-pill">🔌 {product.specs.wattage}</span>}
+            {product.specs.voltage && <span className="spec-pill">🔋 {product.specs.voltage}</span>}
+            {product.specs.backup && <span className="spec-pill">⏱️ {product.specs.backup}</span>}
+          </div>
+        )}
+        <div className="product-price-row">
+          <span className="store-price">₹{parseFloat(product.price).toLocaleString("en-IN")}</span>
+          <span className={`stock-tag ${product.stock_qty > 5 ? "in-stock" : product.stock_qty > 0 ? "low-stock" : "out-of-stock"}`}>
+            {product.stock_qty > 5 ? "In Stock" : product.stock_qty > 0 ? `Only ${product.stock_qty} left` : "Out of Stock"}
+          </span>
+        </div>
         {product.warranty && <p className="warranty-tag">🛡️ {product.warranty}</p>}
-        <div className="store-card-actions"><button className="btn btn-primary" onClick={() => onAddToCart && onAddToCart(product)} disabled={product.stock_qty <= 0}>🛒 Add to Cart</button><button className="btn btn-secondary">Buy Now</button></div>
+        <div className="store-card-actions">
+          <motion.button
+            className="btn btn-primary"
+            onClick={handleAddToCart}
+            disabled={product.stock_qty <= 0 || added}
+            whileTap={{ scale: 0.95 }}
+            animate={added ? { scale: [1, 1.08, 1] } : {}}
+            transition={{ duration: 0.2 }}
+          >
+            {added ? "✓ Added" : "🛒 Add to Cart"}
+          </motion.button>
+          <button className="btn btn-secondary">Buy Now</button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

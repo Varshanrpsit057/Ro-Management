@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const slides = [
   {
@@ -38,32 +39,50 @@ export default function Slideshow() {
     return () => clearInterval(timer);
   }, [next]);
 
-  const slide = slides[current];
-
   return (
     <div className="slideshow">
       <div className="slideshow-track">
-        {slides.map((s, i) => (
-          <div
-            key={i}
-            className={`slideshow-slide ${i === current ? "active" : ""}`}
-            style={{ backgroundImage: `url(${s.image})` }}
-          >
-            <div className="slideshow-overlay">
-              <div className="slideshow-content fade-in">
-                <h1>{s.title}</h1>
-                <p className="slideshow-subtitle">{s.subtitle}</p>
-                <p className="slideshow-detail">{s.detail}</p>
-                <a href={s.link} className="hero-btn">{s.cta} →</a>
-              </div>
-            </div>
-          </div>
-        ))}
+        <AnimatePresence mode="wait">
+          {slides.map(
+            (s, i) =>
+              i === current && (
+                <motion.div
+                  key={i}
+                  className="slideshow-slide active"
+                  style={{ backgroundImage: `url(${s.image})` }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <div className="slideshow-overlay">
+                    <motion.div
+                      className="slideshow-content"
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                      <h1>{s.title}</h1>
+                      <p className="slideshow-subtitle">{s.subtitle}</p>
+                      <p className="slideshow-detail">{s.detail}</p>
+                      <motion.a
+                        href={s.link}
+                        className="btn btn-primary btn-lg"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.97 }}
+                        style={{ display: "inline-flex", fontSize: "0.95rem", padding: "0.75rem 2rem" }}
+                      >
+                        {s.cta} →
+                      </motion.a>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              )
+          )}
+        </AnimatePresence>
       </div>
-
       <button className="slideshow-arrow left" onClick={prev}>‹</button>
       <button className="slideshow-arrow right" onClick={next}>›</button>
-
       <div className="slideshow-indicators">
         {slides.map((_, i) => (
           <button

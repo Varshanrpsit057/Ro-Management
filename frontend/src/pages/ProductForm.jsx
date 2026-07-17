@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchProduct, createProduct, updateProduct } from "../api";
 
 export default function ProductForm() {
@@ -7,20 +8,14 @@ export default function ProductForm() {
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock_qty: 0,
-    image_url: "",
-  });
+  const [form, setForm] = useState({ name: "", description: "", price: "", stock_qty: 0, image_url: "" });
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (id) {
       fetchProduct(id)
         .then((p) => setForm({ ...p, price: String(p.price) }))
-        .catch(() => navigate("/products"));
+        .catch(() => navigate("/admin/products"));
     }
   }, [id]);
 
@@ -29,22 +24,19 @@ export default function ProductForm() {
     setError("");
     const payload = { ...form, price: parseFloat(form.price), stock_qty: parseInt(form.stock_qty, 10) || 0 };
     try {
-      if (isEdit) {
-        await updateProduct(id, payload);
-      } else {
-        await createProduct(payload);
-      }
-      navigate("/products");
+      if (isEdit) await updateProduct(id, payload);
+      else await createProduct(payload);
+      navigate("/admin/products");
     } catch (err) {
       setError(err.response?.data?.error || "Failed to save product");
     }
   };
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
       <h2>{isEdit ? "Edit Product" : "Add Product"}</h2>
       {error && <div className="alert alert-error">{error}</div>}
-      <form onSubmit={handleSubmit} className="form">
+      <form onSubmit={handleSubmit} className="form card" style={{ marginTop: "1rem" }}>
         <div className="form-group">
           <label>Name *</label>
           <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -68,10 +60,10 @@ export default function ProductForm() {
           <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
         </div>
         <div className="form-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => navigate("/products")}>Cancel</button>
+          <button type="button" className="btn btn-secondary" onClick={() => navigate("/admin/products")}>Cancel</button>
           <button type="submit" className="btn btn-primary">{isEdit ? "Update" : "Create"}</button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }

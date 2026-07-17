@@ -1,9 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PublicLayout({ children }) {
-  const [cartCount] = useState(() => parseInt(localStorage.getItem("cart_count") || "0", 10));
+  const [cartCount, setCartCount] = useState(() => parseInt(localStorage.getItem("cart_count") || "0", 10));
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handler = () => setCartCount(parseInt(localStorage.getItem("cart_count") || "0", 10));
+    window.addEventListener("cart-updated", handler);
+    return () => window.removeEventListener("cart-updated", handler);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => { setMobileOpen(false); }, [location]);
 
   const navItems = [
     { path: "/", label: "Home" },
@@ -16,16 +33,41 @@ export default function PublicLayout({ children }) {
 
   return (
     <div className="public-layout">
-      <header className="public-navbar">
+      <header className={`public-navbar ${scrolled ? "scrolled" : ""}`}>
         <div className="nav-container">
-          <Link to="/" className="nav-logo">💧 ACS RO Water System</Link>
+          <Link to="/" className="nav-logo">ACS RO Water System</Link>
+          <button className="nav-toggle" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+            {mobileOpen ? "✕" : "☰"}
+          </button>
           <nav className="nav-links">
             {navItems.map((item) => (
-              <Link key={item.path} to={item.path} className={`nav-item ${location.pathname === item.path ? "active" : ""}`}>{item.label}</Link>
+              <Link key={item.path} to={item.path} className={`nav-item ${location.pathname === item.path ? "active" : ""}`}>
+                {item.label}
+              </Link>
             ))}
-            <Link to="/cart" className="nav-item cart-link">🛒 Cart {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}</Link>
+            <Link to="/cart" className="nav-item cart-link">
+              Cart {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </Link>
           </nav>
         </div>
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              className="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              {navItems.map((item) => (
+                <Link key={item.path} to={item.path} className={`nav-item ${location.pathname === item.path ? "active" : ""}`}>
+                  {item.label}
+                </Link>
+              ))}
+              <Link to="/cart" className="nav-item">Cart {cartCount > 0 && `(${cartCount})`}</Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
       <main>{children}</main>
       <footer className="public-footer">
@@ -36,15 +78,15 @@ export default function PublicLayout({ children }) {
           </div>
           <div>
             <h4>Contact</h4>
-            <p>📍 Kambainallur Main Road,<br />Opposite Bai Rice Mill,<br />Morappur, Dharmapuri - 635305</p>
+            <p>📍 Kambainallur Main Road, Opposite Bai Rice Mill, Morappur, Dharmapuri - 635305</p>
             <p>📞 9442878041 | 8838925135</p>
             <p>✉️ acsrowater@gmail.com</p>
           </div>
           <div>
             <h4>Quick Links</h4>
-            <Link to="/ro-products">RO Products</Link><br />
-            <Link to="/ups-products">UPS Products</Link><br />
-            <Link to="/book-service">Book Service</Link><br />
+            <Link to="/ro-products">RO Products</Link>
+            <Link to="/ups-products">UPS Products</Link>
+            <Link to="/book-service">Book Service</Link>
             <Link to="/contact">Contact Us</Link>
           </div>
         </div>

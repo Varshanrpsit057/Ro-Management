@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchSystem, fetchServiceHistory, fetchFilterReplacements, createServiceRecord, createFilterReplacement } from "../api";
 
 export default function ServiceHistory() {
@@ -9,16 +10,8 @@ export default function ServiceHistory() {
   const [filters, setFilters] = useState([]);
   const [tab, setTab] = useState("history");
   const [showForm, setShowForm] = useState(false);
-
-  // History form
   const [histForm, setHistForm] = useState({ service_date: "", description: "", cost: "" });
-  // Filter replacement form
-  const [filtForm, setFiltForm] = useState({
-    filter_type: "sediment",
-    replaced_date: "",
-    cost: "",
-    notes: "",
-  });
+  const [filtForm, setFiltForm] = useState({ filter_type: "sediment", replaced_date: "", cost: "", notes: "" });
 
   const load = () => {
     fetchSystem(id).then(setSystem);
@@ -46,10 +39,12 @@ export default function ServiceHistory() {
   if (!system) return <div className="loading">Loading...</div>;
 
   return (
-    <div>
-      <h2>Service History — {system.model_name}</h2>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      <div className="page-header">
+        <h2>Service History — {system.model_name}</h2>
+      </div>
 
-      <div className="tabs" style={{ marginBottom: "1rem" }}>
+      <div className="tabs" style={{ marginBottom: "1.5rem" }}>
         <button className={`tab ${tab === "history" ? "active" : ""}`} onClick={() => setTab("history")}>
           Service Records ({history.length})
         </button>
@@ -58,13 +53,10 @@ export default function ServiceHistory() {
         </button>
       </div>
 
-      {/* ---------- Service History Tab ---------- */}
       {tab === "history" && (
         <>
           {!showForm ? (
-            <button className="btn btn-primary" style={{ marginBottom: "1rem" }} onClick={() => setShowForm(true)}>
-              + Add Service Record
-            </button>
+            <button className="btn btn-primary" style={{ marginBottom: "1rem" }} onClick={() => setShowForm(true)}>+ Add Service Record</button>
           ) : (
             <form onSubmit={handleHistorySubmit} className="form card" style={{ marginBottom: "1rem" }}>
               <div className="form-row">
@@ -90,25 +82,24 @@ export default function ServiceHistory() {
           {history.length === 0 ? (
             <p className="empty">No service records yet.</p>
           ) : (
-            <table className="table">
-              <thead>
-                <tr><th>Date</th><th>Description</th><th>Cost</th></tr>
-              </thead>
-              <tbody>
-                {history.map((h) => (
-                  <tr key={h.id}>
-                    <td>{new Date(h.service_date).toLocaleDateString()}</td>
-                    <td>{h.description}</td>
-                    <td>{h.cost ? `₹${parseFloat(h.cost).toFixed(2)}` : "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="table-wrap">
+              <table className="table">
+                <thead><tr><th>Date</th><th>Description</th><th>Cost</th></tr></thead>
+                <tbody>
+                  {history.map((h) => (
+                    <tr key={h.id}>
+                      <td>{new Date(h.service_date).toLocaleDateString()}</td>
+                      <td>{h.description}</td>
+                      <td>{h.cost ? `₹${parseFloat(h.cost).toFixed(2)}` : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
 
-      {/* ---------- Filter Replacements Tab ---------- */}
       {tab === "filters" && (
         <>
           <form onSubmit={handleFilterSubmit} className="form card" style={{ marginBottom: "1rem" }}>
@@ -143,27 +134,27 @@ export default function ServiceHistory() {
           {filters.length === 0 ? (
             <p className="empty">No filter replacements yet.</p>
           ) : (
-            <table className="table">
-              <thead>
-                <tr><th>Filter Type</th><th>Replaced</th><th>Next Due</th><th>Cost</th><th>Notes</th></tr>
-              </thead>
-              <tbody>
-                {filters.map((f) => (
-                  <tr key={f.id}>
-                    <td><span className="filter-tag">{f.filter_type.replace("_", " ")}</span></td>
-                    <td>{new Date(f.replaced_date).toLocaleDateString()}</td>
-                    <td className={new Date(f.next_due_date) < new Date() ? "text-danger" : ""}>
-                      {new Date(f.next_due_date).toLocaleDateString()}
-                    </td>
-                    <td>{f.cost ? `₹${parseFloat(f.cost).toFixed(2)}` : "—"}</td>
-                    <td>{f.notes || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="table-wrap">
+              <table className="table">
+                <thead><tr><th>Filter Type</th><th>Replaced</th><th>Next Due</th><th>Cost</th><th>Notes</th></tr></thead>
+                <tbody>
+                  {filters.map((f) => (
+                    <tr key={f.id}>
+                      <td><span className="filter-tag">{f.filter_type.replace("_", " ")}</span></td>
+                      <td>{new Date(f.replaced_date).toLocaleDateString()}</td>
+                      <td className={new Date(f.next_due_date) < new Date() ? "text-danger" : ""}>
+                        {new Date(f.next_due_date).toLocaleDateString()}
+                      </td>
+                      <td>{f.cost ? `₹${parseFloat(f.cost).toFixed(2)}` : "—"}</td>
+                      <td>{f.notes || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

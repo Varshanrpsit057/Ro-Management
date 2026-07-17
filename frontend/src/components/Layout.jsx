@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchNotifications, logoutUser } from "../api";
 
 export default function Layout({ children }) {
@@ -20,33 +21,31 @@ export default function Layout({ children }) {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logoutUser();
-    } catch {}
+    try { await logoutUser(); } catch {}
     localStorage.removeItem("ro_token");
     localStorage.removeItem("ro_user");
     navigate("/login");
   };
 
   const navItems = [
-    { path: "/", label: "Dashboard", icon: "📊" },
-    { path: "/customers", label: "Customers", icon: "👥" },
-    { path: "/products", label: "Products", icon: "📦" },
-    { path: "/notifications", label: "Notifications", icon: "🔔" },
+    { path: "/admin/", label: "Dashboard", icon: "📊" },
+    { path: "/admin/customers", label: "Customers", icon: "👥" },
+    { path: "/admin/products", label: "Products", icon: "📦" },
+    { path: "/admin/notifications", label: "Notifications", icon: "🔔" },
   ];
 
   return (
     <div className="layout">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <h2>💧 RO Manager</h2>
+          <h2>ACS RO Manager</h2>
         </div>
         <nav>
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`nav-link ${location.pathname === item.path ? "active" : ""}`}
+              className={`nav-link ${location.pathname === item.path || (item.path !== "/admin/" && location.pathname.startsWith(item.path)) ? "active" : ""}`}
             >
               <span className="nav-icon">{item.icon}</span>
               <span>{item.label}</span>
@@ -61,13 +60,19 @@ export default function Layout({ children }) {
         <header className="topbar">
           <h1>RO Water Service Manager</h1>
           <div className="topbar-right">
-            <span className="user-badge">👤 {username}</span>
-            <button onClick={handleLogout} className="btn btn-sm btn-secondary">
-              Logout
-            </button>
+            <span className="user-badge">{username}</span>
+            <button onClick={handleLogout} className="btn btn-sm btn-secondary">Logout</button>
           </div>
         </header>
-        <div className="content">{children}</div>
+        <motion.div
+          className="content"
+          key={location.pathname}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {children}
+        </motion.div>
       </main>
     </div>
   );

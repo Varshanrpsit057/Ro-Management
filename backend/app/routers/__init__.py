@@ -1,0 +1,10 @@
+from .auth import router as auth_router
+from .customers import router as customers_router
+from .products import router as products_router
+from .ro_systems import router as ro_systems_router
+from .filter_replacements import router as filter_replacements_router
+from .service_history import router as service_history_router
+from .dashboard import router as dashboard_router
+from .notifications import router as notifications_router
+from .store import router as store_router
+from .orders import router as orders_router

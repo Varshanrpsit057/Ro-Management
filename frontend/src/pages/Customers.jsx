@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchCustomers, deleteCustomer } from "../api";
 import ConfirmDialog from "../components/ConfirmDialog";
 
@@ -14,9 +15,7 @@ export default function Customers() {
       .catch((err) => console.error(err));
   };
 
-  useEffect(() => {
-    load();
-  }, [search]);
+  useEffect(() => { load(); }, [search]);
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -27,10 +26,10 @@ export default function Customers() {
   };
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="page-header">
         <h2>Customers</h2>
-        <Link to="/customers/new" className="btn btn-primary">+ Add Customer</Link>
+        <Link to="/admin/customers/new" className="btn btn-primary">+ Add Customer</Link>
       </div>
       <input
         type="text"
@@ -39,35 +38,37 @@ export default function Customers() {
         onChange={(e) => setSearch(e.target.value)}
         className="search-input"
       />
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.length === 0 ? (
-            <tr><td colSpan={4} className="empty">No customers found.</td></tr>
-          ) : (
-            customers.map((c) => (
-              <tr key={c.id}>
-                <td>
-                  <Link to={`/customers/${c.id}`} className="link">{c.name}</Link>
-                </td>
-                <td>{c.phone}</td>
-                <td>{c.address || "—"}</td>
-                <td>
-                  <Link to={`/customers/${c.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
-                  <button onClick={() => setDeleteId(c.id)} className="btn btn-sm btn-danger">Delete</button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <div className="table-wrap">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.length === 0 ? (
+              <tr><td colSpan={4} className="empty">No customers found.</td></tr>
+            ) : (
+              customers.map((c) => (
+                <tr key={c.id}>
+                  <td style={{ fontWeight: 600 }}>
+                    <Link to={`/admin/customers/${c.id}`} className="link">{c.name}</Link>
+                  </td>
+                  <td>{c.phone}</td>
+                  <td>{c.address || "—"}</td>
+                  <td>
+                    <Link to={`/admin/customers/${c.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
+                    <button onClick={() => setDeleteId(c.id)} className="btn btn-sm btn-danger">Delete</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
       {deleteId && (
         <ConfirmDialog
           message="Delete this customer and all their RO systems?"
@@ -75,6 +76,6 @@ export default function Customers() {
           onCancel={() => setDeleteId(null)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

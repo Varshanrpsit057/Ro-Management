@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { fetchProducts, deleteProduct } from "../api";
 import ConfirmDialog from "../components/ConfirmDialog";
 
@@ -25,10 +26,10 @@ export default function Products() {
   };
 
   return (
-    <div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <div className="page-header">
         <h2>Products</h2>
-        <Link to="/products/new" className="btn btn-primary">+ Add Product</Link>
+        <Link to="/admin/products/new" className="btn btn-primary">+ Add Product</Link>
       </div>
       <input
         type="text"
@@ -38,13 +39,17 @@ export default function Products() {
         className="search-input"
       />
       {products.length === 0 ? (
-        <p className="empty">No products found.</p>
+        <div className="empty-state">
+          <div className="empty-state-icon">📦</div>
+          <h3>No products found</h3>
+          <p>Add products to manage your inventory</p>
+        </div>
       ) : (
         <div className="product-grid">
           {products.map((p) => (
             <div key={p.id} className="product-card">
               {p.image_url && (
-                <img src={p.image_url} alt={p.name} className="product-image" />
+                <img src={p.image_url} alt={p.name} className="product-image" loading="lazy" />
               )}
               <div className="product-info">
                 <h3>{p.name}</h3>
@@ -56,7 +61,7 @@ export default function Products() {
                   </span>
                 </div>
                 <div className="product-actions">
-                  <Link to={`/products/${p.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
+                  <Link to={`/admin/products/${p.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
                   <button onClick={() => setDeleteId(p.id)} className="btn btn-sm btn-danger">Delete</button>
                 </div>
               </div>
@@ -71,6 +76,6 @@ export default function Products() {
           onCancel={() => setDeleteId(null)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
