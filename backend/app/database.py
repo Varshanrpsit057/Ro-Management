@@ -2,10 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from .config import DATABASE_URL
 
-# psycopg3 uses postgresql+psycopg:// scheme
-DB_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://")
-
-engine = create_engine(DB_URL, pool_pre_ping=True, pool_size=10)
+# PostgreSQL connection string from .env
+engine = create_engine(DATABASE_URL.replace("postgresql://", "postgresql+psycopg://"), pool_pre_ping=True, pool_size=10)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

@@ -13,7 +13,17 @@ from sqlalchemy import (
     text,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import JSONB, ARRAY
+from sqlalchemy.dialects.postgresql import JSONB, ARRAY as PG_ARRAY
+from sqlalchemy import JSON
+import os
+
+# SQLite doesn't support JSONB or ARRAY — use JSON and JSON instead
+_is_sqlite = os.getenv("DATABASE_URL", "").startswith("sqlite") or not os.getenv("DB_HOST")
+if _is_sqlite:
+    JSONB = JSON
+    ARRAY = JSON
+else:
+    ARRAY = PG_ARRAY
 from ..database import Base
 
 

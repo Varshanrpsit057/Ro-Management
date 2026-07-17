@@ -1,28 +1,53 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { loginUser } from "../api";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect") || "";
+  const productId = searchParams.get("product") || "";
+
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // If already logged in, redirect
+  useEffect(() => {
+    const token = localStorage.getItem("ro_token");
+    if (token) {
+      if (redirect === "checkout") {
+        navigate(productId ? `/product/${productId}` : "/cart");
+      } else {
+        navigate("/admin/");
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const data = await loginUser(form);
+      const data = await loginUser({ username: form.username, password: form.password });
       localStorage.setItem("ro_token", data.token);
       localStorage.setItem("ro_user", JSON.stringify(data.user));
-      navigate("/admin/");
+      if (redirect === "checkout") {
+        navigate(productId ? `/product/${productId}` : "/cart");
+      } else {
+        navigate("/admin/");
+      }
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const quickLogin = (role) => {
+    if (role === "admin") setForm({ username: "admin", password: "admin" });
+    else if (role === "staff") setForm({ username: "staff", password: "staff" });
   };
 
   return (
@@ -37,7 +62,7 @@ export default function Login() {
           ACS RO Manager
         </motion.h2>
         <motion.h3 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          Sign in to your account
+          {redirect === "checkout" ? "Sign in to checkout" : "Sign in to your account"}
         </motion.h3>
 
         {error && (
@@ -48,12 +73,13 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="form">
           <div className="form-group">
-            <label>Username</label>
+            <label>Username or Email</label>
             <input
               required
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              placeholder="Enter your username"
+              placeholder="Enter your username or email"
+              autoComplete="username"
             />
           </div>
           <div className="form-group">
@@ -64,6 +90,7 @@ export default function Login() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               placeholder="Enter your password"
+              autoComplete="current-password"
             />
           </div>
           <motion.button
@@ -74,23 +101,29 @@ export default function Login() {
             whileTap={{ scale: 0.98 }}
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Signing in..." : redirect === "checkout" ? "Sign In & Continue" : "Sign In"}
           </motion.button>
         </form>
 
+        {redirect !== "checkout" && (
+          <div className="quick-login">
+            <div className="quick-label">Quick Access (Dev Only)</div>
+            <div className="quick-btns">
+              <button type="button" className="btn btn-sm btn-secondary" onClick={() => quickLogin("admin")}>Admin</button>
+              <button type="button" className="btn btn-sm btn-secondary" onClick={() => quickLogin("staff")}>Staff</button>
+            </div>
+          </div>
+        )}
+
         <p style={{ marginTop: "1.25rem", textAlign: "center", fontSize: "0.88rem", color: "var(--color-slate-500)" }}>
           Don't have an account?{" "}
-          <Link to="/register" className="link">Register</Link>
+          <Link
+            to={redirect === "checkout" ? `/register?redirect=checkout&product=${productId}` : "/register"}
+            className="link"
+          >
+            Create Account
+          </Link>
         </p>
-
-        <div className="quick-login">
-          <p className="quick-label">Quick Login (testing):</p>
-          <div className="quick-btns">
-            <button onClick={() => setForm({ username: "admin", password: "password123" })} className="btn btn-sm btn-secondary">admin</button>
-            <button onClick={() => setForm({ username: "shop1", password: "password123" })} className="btn btn-sm btn-secondary">shop1</button>
-            <button onClick={() => setForm({ username: "demo", password: "password123" })} className="btn btn-sm btn-secondary">demo</button>
-          </div>
-        </div>
       </motion.div>
     </div>
   );

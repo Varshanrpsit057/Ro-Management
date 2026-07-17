@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import ROProducts from "./pages/ROProducts";
 import UPSProducts from "./pages/UPSProducts";
 import CartPage from "./pages/CartPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import { AboutPage, ContactPage, BookServicePage } from "./pages/StaticPages";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
@@ -29,6 +30,9 @@ export default function App() {
       <Route path="/about" element={<PublicLayout><AboutPage /></PublicLayout>} />
       <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
       <Route path="/book-service" element={<PublicLayout><BookServicePage /></PublicLayout>} />
+
+      {/* Product detail page (public, no layout for immersive experience) */}
+      <Route path="/product/:id" element={<PublicLayout><ProductDetailPage /></PublicLayout>} />
 
       {/* Auth routes */}
       <Route path="/login" element={<Login />} />
