@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const BASE = import.meta.env.BASE_URL; // "/acs-varshan/"
+
 /**
  * LazyImage — reusable image component with:
  *  - Lazy loading (native)
@@ -13,7 +15,7 @@ export default function LazyImage({
   alt = "",
   className = "",
   containerClassName = "",
-  fallbackSrc = "/images/ro-system.svg",
+  fallbackSrc = `${BASE}images/ro-system.svg`,
   objectFit = "contain",
   onLoad: onLoadProp,
   onError: onErrorProp,

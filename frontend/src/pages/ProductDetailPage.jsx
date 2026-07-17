@@ -5,6 +5,7 @@ import axios from "axios";
 import LazyImage from "../components/LazyImage";
 
 const API = axios.create({ baseURL: "/api/store" });
+const BASE = import.meta.env.BASE_URL; // "/acs-varshan/"
 
 function getProductImage(product) {
   const cat = product.category || "";
@@ -12,29 +13,29 @@ function getProductImage(product) {
   const brand = (product.brand || "").toLowerCase();
   if (cat === "Complete RO Systems" || name.includes("purifier")) {
     if (brand.includes("aquaguard")) {
-      if (name.includes("marvel")) return "/images/ro-systems/aquaguard-marvel.jpg.jpeg";
-      if (name.includes("aura")) return "/images/ro-systems/aquaguard-aura.jpg.jpeg";
-      if (name.includes("aston")) return "/images/ro-systems/aquaguard-aston.jpg.jpeg";
-      return "/images/ro-systems/aquaguard-marvel.jpg.jpeg";
+      if (name.includes("marvel")) return `${BASE}images/ro-systems/aquaguard-marvel.jpg`;
+      if (name.includes("aura")) return `${BASE}images/ro-systems/aquaguard-aura.jpg`;
+      if (name.includes("aston")) return `${BASE}images/ro-systems/aquaguard-aston.jpg`;
+      return `${BASE}images/ro-systems/aquaguard-marvel.jpg`;
     }
     if (brand.includes("kent")) {
-      if (name.includes("grand")) return "/images/ro-systems/kent-grand-plus.jpg.jpeg";
-      if (name.includes("pride")) return "/images/ro-systems/kent-pride.jpg.jpeg";
-      if (name.includes("supreme")) return "/images/ro-systems/kent-supreme.jpg.jpeg";
-      return "/images/ro-systems/kent-grand-plus.jpg.jpeg";
+      if (name.includes("grand")) return `${BASE}images/ro-systems/kent-grand-plus.jpg`;
+      if (name.includes("pride")) return `${BASE}images/ro-systems/kent-pride.jpg`;
+      if (name.includes("supreme")) return `${BASE}images/ro-systems/kent-supreme.jpg`;
+      return `${BASE}images/ro-systems/kent-grand-plus.jpg`;
     }
-    if (brand.includes("livpure")) return "/images/ro-systems/livpure-glo.jpg.jpeg";
-    if (brand.includes("pureit")) return "/images/ro-systems/pureit-advanced.jpg.jpeg";
-    if (brand.includes("grand aqua") || brand.includes("aqua grand")) return "/images/ro-systems/grand-aqua-domestic.jpg.jpeg";
-    if (brand.includes("elpron")) return "/images/ro-systems/elpron-domestic.jpg.jpeg";
-    return "/images/ro-systems/kent-grand-plus.jpg.jpeg";
+    if (brand.includes("livpure")) return `${BASE}images/ro-systems/livpure-glo.jpg`;
+    if (brand.includes("pureit")) return `${BASE}images/ro-systems/pureit-advanced.jpg`;
+    if (brand.includes("grand aqua") || brand.includes("aqua grand")) return `${BASE}images/ro-systems/grand-aqua-domestic.jpg`;
+    if (brand.includes("elpron")) return `${BASE}images/ro-systems/elpron-domestic.jpg`;
+    return `${BASE}images/ro-systems/kent-grand-plus.jpg`;
   }
-  if (cat === "Filters" || name.includes("filter")) return "/images/filters/PP filter.png";
-  if (cat === "Membranes" || name.includes("membrane")) return "/images/filters/2012-100-2012-100-Gpd-RO-Membrane-100gpd.avif";
-  if (cat === "Pumps" || name.includes("pump")) return "/images/pumps/booster-pump.jpg.jpeg";
-  if (cat.includes("Batteries") || name.includes("battery")) return "/images/batteries/powerzone-battery.jpg.jpeg";
-  if (cat.includes("UPS") || name.includes("ups") || name.includes("inverter")) return "/images/ups.svg";
-  return "/images/ro-system.svg";
+  if (cat === "Filters" || name.includes("filter")) return `${BASE}images/filters/PP filter.png`;
+  if (cat === "Membranes" || name.includes("membrane")) return `${BASE}images/filters/2012-100-2012-100-Gpd-RO-Membrane-100gpd.avif`;
+  if (cat === "Pumps" || name.includes("pump")) return `${BASE}images/pumps/booster-pump.jpg`;
+  if (cat.includes("Batteries") || name.includes("battery")) return `${BASE}images/batteries/powerzone-battery.jpg`;
+  if (cat.includes("UPS") || name.includes("ups") || name.includes("inverter")) return `${BASE}images/ups.svg`;
+  return `${BASE}images/ro-system.svg`;
 }
 
 const demoReviews = [
@@ -101,7 +102,7 @@ export default function ProductDetailPage() {
           {/* Gallery */}
           <motion.div className="pd-gallery" initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
             <div className="pd-main-image" onClick={() => setLightboxOpen(true)}>
-              <LazyImage src={images[activeImage]} alt={product.name} containerClassName="pd-lazy-wrap" className="pd-main-img" objectFit="contain" fallbackSrc="/images/ro-system.svg" />
+              <LazyImage src={images[activeImage]} alt={product.name} containerClassName="pd-lazy-wrap" className="pd-main-img" objectFit="contain" fallbackSrc={`${BASE}images/ro-system.svg`} />
               <div className="pd-zoom-hint">🔍 Click to zoom</div>
             </div>
           </motion.div>
